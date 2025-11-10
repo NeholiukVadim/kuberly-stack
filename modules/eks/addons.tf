@@ -2,7 +2,6 @@ resource "aws_eks_addon" "vpc_cni" {
   cluster_name      = module.eks.cluster_name
   addon_name        = "vpc-cni"
   addon_version     = var.addon_vpc_cni_version
-  resolve_conflicts = "OVERWRITE"
 
   configuration_values = jsonencode({
     init = {
@@ -54,7 +53,6 @@ resource "aws_eks_addon" "coredns" {
   cluster_name      = module.eks.cluster_name
   addon_name        = "coredns"
   addon_version     = var.addon_coredns_version
-  resolve_conflicts = "OVERWRITE"
 
   configuration_values = jsonencode({
     resources = {
@@ -98,7 +96,6 @@ resource "aws_eks_addon" "kube_proxy" {
   cluster_name      = module.eks.cluster_name
   addon_name        = "kube-proxy"
   addon_version     = var.addon_kube_proxy_version
-  resolve_conflicts = "OVERWRITE"
   configuration_values = jsonencode({
     resources = {
       requests = {
@@ -117,7 +114,6 @@ resource "aws_eks_addon" "pod_identity" {
   cluster_name      = module.eks.cluster_name
   addon_name        = "eks-pod-identity-agent"
   addon_version     = var.addon_pod_identity_version
-  resolve_conflicts = "OVERWRITE"
   configuration_values = jsonencode({
     resources = {
       requests = {
@@ -136,7 +132,6 @@ resource "aws_eks_addon" "ebs_csi" {
   cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
   addon_version            = var.addon_ebs_csi_version
-  resolve_conflicts        = "OVERWRITE"
   service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
   configuration_values = jsonencode({
     controller = {

@@ -1,16 +1,16 @@
 locals {
-  vela_sa_name      = "kubevela-vela-core"
-  vela_sa_namespace = "vela-system"
+  sa_name      = "default"
+  sa_namespace = "default"
 }
 
-module "kuberly_internal" {
+module "internal_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.0"
+  version = "~> 5.60.0"
 
-  role_name_prefix = "kuberly-internal-${var.environment}-"
+  role_name_prefix = "internal-${var.environment}-"
 
   role_policy_arns = {
-    ECRAccess = aws_iam_policy.kuberly_internal.arn
+    ECRAccess = aws_iam_policy.internal_policy.arn
     SESAccess = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
     EC2ContainerRegistryAccess = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
   }
@@ -18,13 +18,13 @@ module "kuberly_internal" {
   oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kuberly:core", "kuberly:hub", "${local.vela_sa_namespace}:${local.vela_sa_name}", "eks-delete-system:eks-delete"]
+      namespace_service_accounts = ["kuberly:core", "kuberly:hub", "${local.sa_namespace}:${local.sa_name}", "eks-delete-system:eks-delete"]
     }
   }
 }
 
-resource "aws_iam_policy" "kuberly_internal" { 
-  name_prefix = "kuberly-internal-${var.environment}-"
+resource "aws_iam_policy" "internal_policy" { 
+  name_prefix = "internal-${var.environment}-"
 
   policy = jsonencode({
     Version = "2012-10-17"

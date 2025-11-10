@@ -1,8 +1,7 @@
 # EKS module and dependent resources
 
 locals {
-  terraform_plan_role  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.terraform_plan_role_name}"
-  terraform_apply_role = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.terraform_apply_role_name}"
+  kuberly_manager_role  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.kuberly_manager_role}"
 
   node_security_group_additional_rules = {
     ingress_all = {
@@ -22,22 +21,19 @@ locals {
     }
   }
 
-  cluster_security_group_additional_rules = merge(
-    {},
-    var.environment == "prod" ? {
-      ingress_vpn = {
-        description          = "Allow VPN SG to access EKS API on 443"
-        protocol             = "tcp"
-        from_port            = 443
-        to_port              = 443
-        type                 = "ingress"
-        source_security_group_id = var.vpn_instance_sg
-      }
-    } : {}
-  )
+  cluster_security_group_additional_rules = var.vpn_instance_sg != "" ? {
+    ingress_vpn = {
+      description          = "Allow VPN SG to access EKS API on 443"
+      protocol             = "tcp"
+      from_port            = 443
+      to_port              = 443
+      type                 = "ingress"
+      source_security_group_id = var.vpn_instance_sg
+    }
+  } : {}
   
-  user_access_entries = {
-    for username in var.eks_access_aws_iam_users["admins"] : username => {
+  user_access_entries = length(var.eks_access_iam_users) > 0 ? {
+    for username in var.eks_access_iam_users : username => {
       policy_associations = {
           admin_policy = {
             policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -49,31 +45,31 @@ locals {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${username}"
       type          = "STANDARD"
     }
-  }
+  } : {}
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.36.0"
+  version = "~> 21.8.0"
 
-  cluster_version                 = var.cluster_version
-  cluster_name                    = var.environment
-  cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = var.cluster_endpoint_public
-  cluster_enabled_log_types       = []
+  name               = var.environment
+  kubernetes_version = var.cluster_version
+
+  endpoint_public_access  = var.cluster_endpoint_public
+  endpoint_private_access = true
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets_ids
 
-  iam_role_name                      = var.environment
-  cluster_security_group_name        = var.environment
-  cluster_security_group_description = "EKS cluster security group."
-  prefix_separator                   = ""
-  kms_key_administrators             = [local.terraform_plan_role, local.terraform_apply_role]
+  iam_role_name = var.environment
 
-  enable_irsa               = true
+  security_group_name        = var.environment
+  security_group_description = "EKS cluster security group."
+  security_group_additional_rules = local.cluster_security_group_additional_rules
 
-  cluster_security_group_additional_rules = var.environment == "prod" ? local.cluster_security_group_additional_rules : {}
+  kms_key_administrators = [local.kuberly_manager_role]
+
+  enable_irsa = true
 
   node_security_group_additional_rules = local.node_security_group_additional_rules
 
@@ -96,7 +92,7 @@ module "eks" {
   }
 
   access_entries = merge({
-    terraform_plan = {
+    kuberly_manager = {
       policy_associations = {
         admin_policy = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -105,20 +101,7 @@ module "eks" {
           }
         }
       }
-      principal_arn    = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.terraform_plan_role_name}"
-      type            = "STANDARD"
-    }
-
-    terraform_apply = {
-      policy_associations = {
-          admin_policy = {
-            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-            access_scope = {
-              type = "cluster"
-            }
-          }
-        }
-      principal_arn    = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.terraform_apply_role_name}"
+      principal_arn    = local.kuberly_manager_role
       type            = "STANDARD"
     }
   }, local.user_access_entries)

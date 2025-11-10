@@ -3,9 +3,9 @@ variable "environment" {
   description = "dev|staging|prod"
 }
 
-variable "aws_region" {
+variable "region" {
   type        = string
-  description = "AWS region where to deploy the infrastructure"
+  description = "Region where to deploy the infrastructure"
 }
 
 variable "vpc_id" {
@@ -51,19 +51,15 @@ variable "addon_pod_identity_version" {
   type        = string
   description = "Version of ebs_csi addon"
 }
-variable "eks_access_aws_iam_users" {
-  type        = map(any)
-  description = "AWS IAM users with access to AWS EKS cluster"
+variable "eks_access_iam_users" {
+  type        = list(string)
+  description = "List of IAM user names (SSO usernames) that should have admin access to the EKS cluster"
+  default     = []
 }
 
-variable "terraform_plan_role_name" {
+variable "kuberly_manager_role" {
   type        = string
-  description = "CI/CD IAM role to run terraform plan"
-}
-
-variable "terraform_apply_role_name" {
-  type        = string
-  description = "CI/CD IAM role to run terraform apply"
+  description = "Kuberly manager IAM role"
 }
 
 variable "vpn_instance_sg" {
@@ -76,4 +72,10 @@ variable "dlm_role_arn" {
   type        = string
   description = "Data Lifecycle Manager universal Role ARN"
   default     = ""
+}
+
+variable "bottlerocket_version" {
+  type        = string
+  description = "Bottlerocket version"
+  default     = "1.50.0"
 }

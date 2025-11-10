@@ -33,11 +33,7 @@ spec:
           values: ["1"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          %{if environment == "prod"}
-          values: ["eu-central-1a"]
-          %{else}
-          values: ["eu-west-1a"]
-          %{endif}
+          values: ["${region}"]
   limits:
     cpu: 40
     memory: 100Gi

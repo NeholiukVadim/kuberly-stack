@@ -1,6 +1,6 @@
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~> 20.36.0"
+  version = "~> 20.36.1"
 
   cluster_name                    = module.eks.cluster_name
   create_access_entry             = true
@@ -21,7 +21,7 @@ resource "helm_release" "karpenter_crd" {
   chart               = "karpenter-crd"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  version             = "1.6.3"
+  version             = "1.8.0"
   wait                = true
 
   depends_on = [module.eks.eks_managed_node_groups]
@@ -35,14 +35,14 @@ resource "helm_release" "karpenter" {
   chart             = "karpenter"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  version           = "1.6.3"
+  version           = "1.8.0"
 
   values = [templatefile("./values/karpenter.yaml", {
     cluster_name     = module.eks.cluster_name,
     cluster_endpoint = module.eks.cluster_endpoint,
     queue_name       = module.karpenter.queue_name,
     iam_role_arn     = module.karpenter.iam_role_arn,
-    image_registry   = "${var.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
+    image_registry   = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com"
   })]
 
   depends_on = [helm_release.karpenter_crd]
@@ -60,18 +60,14 @@ resource "kubectl_manifest" "node_class" {
     spec:
       role: ${module.karpenter.node_iam_role_name}
       amiSelectorTerms:
-      - alias: bottlerocket@v1.46.0
+      - alias: bottlerocket@${var.bottlerocket_version}
       kubelet:
-        maxPods: 100
+        maxPods: 110
       blockDeviceMappings:
       - deviceName: /dev/xvda
         ebs:
           deleteOnTermination: true
-          %{if var.environment == "prod"}
           volumeSize: 30Gi
-          %{else}
-          volumeSize: 20Gi
-          %{endif}
           volumeType: gp3
       securityGroupSelectorTerms:
       - tags:
@@ -85,7 +81,7 @@ resource "kubectl_manifest" "node_class" {
         httpPutResponseHopLimit: 2
         httpTokens: optional
       tags:
-        Name: default
+        type: karpenter
   YAML
 
   depends_on = [
@@ -96,6 +92,7 @@ resource "kubectl_manifest" "node_class" {
 resource "kubectl_manifest" "karpenter_node_pool" {
   yaml_body = templatefile("./nodepools/default.yaml", {
     environment     = var.environment
+    region          = var.region
   })
 
   depends_on = [
@@ -106,6 +103,7 @@ resource "kubectl_manifest" "karpenter_node_pool" {
 resource "kubectl_manifest" "karpenter_node_pool_on_demand" {
   yaml_body = templatefile("./nodepools/on-demand.yaml", {
     environment     = var.environment
+    region          = var.region
   })
 
   depends_on = [
@@ -116,6 +114,7 @@ resource "kubectl_manifest" "karpenter_node_pool_on_demand" {
 resource "kubectl_manifest" "on_demand_arm" {
   yaml_body = templatefile("./nodepools/on-demand-arm.yaml", {
     environment     = var.environment
+    region          = var.region
   })
 
   depends_on = [
@@ -126,6 +125,7 @@ resource "kubectl_manifest" "on_demand_arm" {
 resource "kubectl_manifest" "spot_node_pool" {
   yaml_body = templatefile("./nodepools/spot.yaml", {
     environment     = var.environment
+    region          = var.region
   })
 
   depends_on = [
@@ -136,6 +136,7 @@ resource "kubectl_manifest" "spot_node_pool" {
 resource "kubectl_manifest" "arm_spot_ci_node_pool" {
   yaml_body = templatefile("./nodepools/spot-arm.yaml", {
     environment     = var.environment
+    region          = var.region
   })
 
   depends_on = [

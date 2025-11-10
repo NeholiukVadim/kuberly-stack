@@ -10,7 +10,7 @@ remote_state {
         if_exists = "overwrite"
     }
     config = {
-        bucket         = "${get_aws_account_id()}-eu-terraform-states-dev"
+        bucket         = "${get_aws_account_id()}-${include.root.inputs.region}-${include.root.inputs.environment}-tf-states"
         region         = "eu-west-1"
         key            = "tools/terraform.tfstate"
         use_lockfile   = true

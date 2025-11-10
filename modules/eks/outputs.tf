@@ -32,14 +32,10 @@ output "cluster_primary_security_group_id" {
   value = module.eks.cluster_primary_security_group_id
 }
 
-output "db_security_group" {
-  value = var.environment == "prod" ? aws_security_group.db_sg[0].id : ""
+output "k8s_manager_sa_role_arn" {
+  value = module.k8s-manager.iam_role_arn
 }
 
-output "k8s_operators_sa_role_arn" {
-  value = module.k8s-controller-manager.iam_role_arn
-}
-
-output "kuberly_internal_role_arn" {
-  value = module.kuberly_internal.iam_role_arn
+output "internal_role_arn" {
+  value = module.internal_role.iam_role_arn
 }
