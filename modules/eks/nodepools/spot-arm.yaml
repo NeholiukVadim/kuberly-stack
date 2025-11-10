@@ -1,0 +1,71 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: spot-arm
+  namespace: karpenter
+  labels:
+    "type": "karpenter"
+spec:
+  template:
+    metadata:
+      labels:
+        "type": "karpenter"
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: default
+      requirements:
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["arm64"]
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["spot"]
+        - key: "karpenter.k8s.aws/instance-size"
+          operator: In
+          values: ["medium", "large", "xlarge", "2xlarge", "4xlarge"]
+        - key: "karpenter.k8s.aws/instance-category"
+          operator: In
+          values: ["c", "m", "r", "t"]
+        - key: "karpenter.k8s.aws/instance-generation"
+          operator: Gt
+          values: ["1"]
+        - key: "karpenter.k8s.aws/instance-cpu"
+          operator: Gt
+          values: ["1"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          %{if environment == "prod"}
+          values: ["eu-central-1a"]
+          %{else}
+          values: ["eu-west-1a"]
+          %{endif}
+  limits:
+    cpu: 40
+    memory: 100Gi
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 5m
+    expireAfter: 168h
+    budgets:
+    - nodes: "0"
+      schedule: "0 9 * * mon-fri"
+      duration: "10h"
+      reasons: ["Underutilized", "Drifted"]
+    - nodes: "20%"
+      schedule: "0 19 * * mon-fri"
+      duration: "13h"
+      reasons: ["Underutilized", "Drifted"]
+    - nodes: "30%"
+      schedule: "0 0 * * mon"
+      duration: "9h"
+      reasons: ["Underutilized", "Drifted"]
+    - nodes: "50%"
+      schedule: "0 0 * * sat"
+      duration: "48h"
+      reasons: ["Underutilized", "Drifted"]
+    - nodes: "100%"
+      reasons: ["Empty"]
+  weight: 80
+  terminationGracePeriod: 60s

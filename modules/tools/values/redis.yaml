@@ -1,0 +1,43 @@
+global:
+  security:
+    allowInsecureImages: true
+image:
+  registry: "${image_registry}"
+  repository: tech-images
+  tag: redis-7-4-2
+  pullPolicy: IfNotPresent
+master:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 46Mi
+    limits:
+      cpu: 50m
+      memory: 46Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+replica:
+  podManagementPolicy: "Parallel"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  replicaCount: 0
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+metrics:
+  serviceMonitor:
+    enabled: true
+auth:
+  enabled: false
+  sentinel: false

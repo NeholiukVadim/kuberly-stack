@@ -1,0 +1,20 @@
+nodeSelector:
+  kubernetes.io/arch: arm64
+  karpenter.sh/capacity-type: "spot"
+  topology.kubernetes.io/zone: "${aws_zone}"
+tolerations:
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  - key: "spot"
+    value: "true"
+    operator: "Equal"
+    effect: "NoSchedule"
+resources:
+  limits:
+    cpu: "50m"
+    memory: "350Mi"
+  requests:
+    cpu: "50m"
+    memory: "350Mi"

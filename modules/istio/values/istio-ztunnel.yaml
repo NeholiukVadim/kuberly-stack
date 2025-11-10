@@ -1,0 +1,21 @@
+_internal_defaults_do_not_set:
+  hub: "${account_id}.dkr.ecr.${aws_region}.amazonaws.com"
+  tag: "ztunnel-1.27.2"
+  image: "istio"
+  resources:
+    requests:
+      cpu: 20m
+      memory: 30Mi
+    limits:
+      cpu: 20m
+      memory: 30Mi
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: eks.amazonaws.com/compute-type
+                operator: NotIn
+                values:
+                  - fargate

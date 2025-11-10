@@ -1,0 +1,255 @@
+traces:
+  otlp:
+    grpc:
+      enabled: true
+      receiverConfig: {}
+
+ingester:
+  affinity: null
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  persistence:
+    enabled: true
+    size: 50Gi
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+    whenDeleted: Retain
+    whenScaled: Retain
+  resources:
+    requests:
+      cpu: 50m
+      memory: 700Mi
+    limits:
+      cpu: 50m
+      memory: 700Mi
+
+# Configuration for the metrics-generator
+metricsGenerator:
+  affinity: null
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Configuration for the distributor
+distributor:
+  affinity: null
+  resources:
+    limits:
+      cpu: 50m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 512Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Configuration for the compactor
+compactor:
+  affinity: null
+  resources:
+    limits:
+      cpu: 30m
+      memory: 130Mi
+    requests:
+      cpu: 30m
+      memory: 130Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Configuration for the querier
+querier:
+  affinity: null
+  resources:
+    limits:
+      cpu: 30m
+      memory: 130Mi
+    requests:
+      cpu: 30m
+      memory: 130Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+# Configuration for the query-frontend
+queryFrontend:
+  affinity: null
+  resources:
+    limits:
+      cpu: 30m
+      memory: 130Mi
+    requests:
+      cpu: 30m
+      memory: 130Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Configuration for the federation-frontend
+# Can only be enabled if enterprise.enabled is true - requires license.
+enterpriseFederationFrontend:
+  affinity: null
+  resources:
+    limits:
+      cpu: 10m
+      memory: 36Mi
+    requests:
+      cpu: 10m
+      memory: 36Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+multitenancyEnabled: false
+
+# memcached is for all of the Tempo pieces to coordinate with each other.
+# you can use your self memcacherd by set enable: false and host + service
+memcached:
+  affinity: null
+  enabled: true
+  resources:
+    limits:
+      cpu: 10m
+      memory: 36Mi
+    requests:
+      cpu: 10m
+      memory: 36Mi
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Configuration for the gateway
+gateway:
+  affinity: null
+  # -- Node selector for gateway pods
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Settings for the admin_api service providing authentication and authorization service.
+# Can only be enabled if enterprise.enabled is true - requires license.
+adminApi:
+  affinity: null
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+# Settings for the gateway service providing authentication and authorization via the admin_api.
+# Can only be enabled if enterprise.enabled is true - requires license.
+enterpriseGateway:
+  affinity: null
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+

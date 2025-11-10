@@ -1,0 +1,27 @@
+config:
+  upstream: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
+  label: "org_slug"
+  extraArgs:
+    - "--enable-label-apis=true"
+    - "--error-on-replace=true"
+    - "--query-param=org_slug"
+tolerations:
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  - key: "on-demand"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+nodeSelector:
+  kubernetes.io/arch: arm64
+  karpenter.sh/capacity-type: on-demand
+  topology.kubernetes.io/zone: "${aws_zone}"
+resources:
+  limits:
+    cpu: 10m
+    memory: 10Mi
+  requests:
+    cpu: 10m
+    memory: 10Mi

@@ -1,0 +1,8 @@
+nodeSelector:
+  kubernetes.io/arch: arm64
+  topology.kubernetes.io/zone: "${aws_zone}"
+tolerations:
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"

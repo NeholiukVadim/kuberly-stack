@@ -1,0 +1,72 @@
+replicaCount: 1
+
+concurrentReconciles: 15
+controllerArgs:
+  reSyncPeriod: 1m
+
+nodeSelector:
+  karpenter.sh/capacity-type: "on-demand"
+  kubernetes.io/arch: arm64
+  topology.kubernetes.io/zone: "${aws_zone}"
+tolerations:
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  - key: "arch/arm"
+    value: "true"
+    operator: "Equal"
+    effect: "NoSchedule"
+
+resources:
+  requests:
+    cpu: 1500m
+    memory: 4000Mi
+  limits:
+    cpu: 1500m
+    memory: 4000Mi
+
+multicluster:
+  enabled: true
+  clusterGateway:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 300m
+        memory: 500Mi
+      limits:
+        cpu: 300m
+        memory: 500Mi
+
+image:
+  repository: ${repository}
+  tag: ${tag}
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${role_arn}
+  name: ${sa_name}
+
+workflow:
+  enableExternalPackageWatchForDefaultCompiler: true
+  enableSuspendOnFailure: false
+  enableExternalPackageForDefaultCompiler: true
+  backoff:
+    maxTime:
+      waitState: 10
+      failedState: 120
+  step:
+    errorRetryTimes: 10
+
+kubeClient:
+  qps: 800
+  burst: 1000
+
+authentication:
+  enabled: false
+  withUser: true
+  defaultUser: kubevela:vela-core
+  groupPattern: kubevela:*
+
+sharding:
+  enabled: false

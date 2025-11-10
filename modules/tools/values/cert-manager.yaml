@@ -1,0 +1,63 @@
+crds:
+  enabled: true
+  keep: true
+replicaCount: 1
+image:
+  repository: quay.io/jetstack/cert-manager-controller
+  # tag: vX.Y.Z
+  pullPolicy: IfNotPresent
+serviceAccount:
+  create: true
+nodeSelector:
+  kubernetes.io/os: linux
+  kubernetes.io/arch: arm64
+  topology.kubernetes.io/zone: "${aws_zone}"
+affinity: {}
+tolerations:
+- key: "arch/arm"
+  value: "true"
+  operator: "Equal"
+  effect: "NoSchedule"
+resources:
+  limits:
+    cpu: 10m
+    memory: 100Mi
+  requests:
+    cpu: 10m
+    memory: 100Mi
+webhook:
+  nodeSelector:
+    kubernetes.io/os: linux
+    kubernetes.io/arch: arm64
+    topology.kubernetes.io/zone: "${aws_zone}"
+  affinity: {}
+  tolerations:
+  - key: "arch/arm"
+    value: "true"
+    operator: "Equal"
+    effect: "NoSchedule"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 10m
+      memory: 20Mi
+
+cainjector:
+  nodeSelector:
+    kubernetes.io/os: linux
+    kubernetes.io/arch: arm64
+  affinity: {}
+  tolerations:
+  - key: "arch/arm"
+    value: "true"
+    operator: "Equal"
+    effect: "NoSchedule"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 100Mi

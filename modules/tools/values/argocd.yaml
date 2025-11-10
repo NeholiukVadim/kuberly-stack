@@ -1,0 +1,200 @@
+global:
+  tolerations:
+  - key: "arch/arm"
+    value: "true"
+    operator: "Equal"
+    effect: "NoSchedule"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    topology.kubernetes.io/zone: "${aws_zone}"
+
+controller:
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1500Mi
+    limits:
+      cpu: 500m
+      memory: 1500Mi
+
+applicationSet:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 150Mi
+    limits:
+      cpu: 50m
+      memory: 150Mi
+
+dex:
+  resources:
+    requests:
+      cpu: 20m
+      memory: 100Mi
+    limits:
+      cpu: 20m
+      memory: 100Mi
+
+notifications:
+  resources:
+    requests:
+      cpu: 30m
+      memory: 60Mi
+    limits:
+      cpu: 30m
+      memory: 60Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 20m
+      memory: 20Mi
+    limits:
+      cpu: 20m
+      memory: 20Mi
+
+server:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 500Mi
+    limits:
+      cpu: 100m
+      memory: 500Mi
+
+repoServer:
+  replicas: 1
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${reposerver_role_arn}
+  initContainers:
+  - name: get-binaries
+    image: ubuntu:22.04
+    command:
+      - "/bin/bash"
+    args:
+     - "-c"
+     - "apt update;
+        apt install -y wget curl;
+        wget -q https://github.com/cue-lang/cue/releases/download/v0.11.2/cue_v0.11.2_linux_arm64.tar.gz;
+        tar -xzf cue_v0.11.2_linux_arm64.tar.gz -C /cue;
+        curl -fsSl https://kubevela.io/script/install.sh | bash -s 1.9.11;"
+    env:
+     - name: VELA_INSTALL_DIR
+       value: /vela
+    resources:
+      requests:
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        cpu: 100m
+        memory: 200Mi
+    volumeMounts:
+    - name: cmp-vela-binary
+      mountPath: /vela
+    - name: cmp-cue-binary
+      mountPath: /cue
+  extraContainers:
+  - name: velacli
+    image: ${account_id}.dkr.ecr.${aws_region}.amazonaws.com/tech-images:argo-cmp-995e6f2
+    command:
+      - "/var/run/argocd/argocd-cmp-server"
+    env:
+     - name: CUE_REGISTRY
+       value: ${account_id}.dkr.ecr.${aws_region}.amazonaws.com/cue-mods
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    volumeMounts:
+      - name: var-files
+        mountPath: /var/run/argocd
+      - name: plugins
+        mountPath: /home/argocd/cmp-server/plugins
+      - name: argocd-cmp-cm
+        mountPath: /home/argocd/cmp-server/config/plugin.yaml
+        subPath: velacli.yaml
+      - name: cmp-tmp
+        mountPath: /tmp
+      - name: velacli-dir
+        mountPath: /.vela
+      - name: awscli-dir
+        mountPath: /.aws
+      - name: ecr-dir
+        mountPath: /.ecr
+      - name: go-cache-dir
+        mountPath: /.cache
+      - name: cmp-vela-binary
+        mountPath: /usr/local/bin/vela
+        subPath: vela
+      - name: cmp-cue-binary
+        mountPath: /usr/local/bin/cue
+        subPath: cue
+  - name: envsubst
+    image: ${account_id}.dkr.ecr.${aws_region}.amazonaws.com/tech-images:argo-cmp-envsubst-27fab92
+    command:
+      - "/var/run/argocd/argocd-cmp-server"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi
+      limits:
+        cpu: 100m
+        memory: 400Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    volumeMounts:
+      - name: var-files
+        mountPath: /var/run/argocd
+      - name: plugins
+        mountPath: /home/argocd/cmp-server/plugins
+      - name: argocd-cmp-cm
+        mountPath: /home/argocd/cmp-server/config/plugin.yaml
+        subPath: envsubst.yaml
+      - name: cmp-tmp
+        mountPath: /tmp
+  volumes:
+    - name: argocd-cmp-cm
+      configMap:
+        name: argocd-cmp-cm
+    - name: cmp-tmp
+      emptyDir: {}
+    - name: velacli-dir
+      emptyDir: {}
+    - name: awscli-dir
+      emptyDir: {}
+    - name: ecr-dir
+      emptyDir: {}
+    - name: go-cache-dir
+      emptyDir: {}
+    - name: cmp-cue-binary
+      emptyDir: {}
+    - name: cmp-vela-binary
+      emptyDir: {}
+  resources:
+    requests:
+      cpu: 800m
+      memory: 400Mi
+    limits:
+      cpu: 800m
+      memory: 400Mi
+
+configs:
+  params:
+    # https://argo-cd.readthedocs.io/en/stable/operator-manual/high_availability/#argocd-repo-server
+    reposerver.parallelism.limit: 5
+  cmp:
+    create: true
+    plugins:
+      velacli:
+        generate:
+          command: ["sh", "-c"]
+          args:
+          - "bash utilities/scripts/deploy.bash $ARGOCD_ENV_MODULE_NAME $ARGOCD_ENV_AWS_REGION;"
+      envsubst:
+        generate:
+          command: ["sh", "-c"]
+          args:
+          - "envsubst < ./ecr.yaml"
+  cm:
+    timeout.reconciliation: 60s

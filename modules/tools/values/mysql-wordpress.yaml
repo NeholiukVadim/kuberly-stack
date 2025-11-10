@@ -1,0 +1,38 @@
+global:
+  security:
+    allowInsecureImages: true
+image:
+  registry: "${image_registry}"
+  repository: tech-images
+  tag: bn-mysql-8.4.4
+  pullPolicy: IfNotPresent
+primary:
+  podAnnotations:
+    karpenter.sh/do-not-disrupt: "true"
+  persistence:
+    existingClaim: "mysql-wp"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+secondary:
+  podAnnotations:
+    karpenter.sh/do-not-disrupt: "true"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    topology.kubernetes.io/zone: "${aws_zone}"
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  replicaCount: 0
+auth:
+  rootPassword: ${password}
+  database: wordpress
+  username: wordpress
+  password: ${password}

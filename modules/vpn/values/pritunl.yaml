@@ -1,0 +1,47 @@
+service:
+  type: ClusterIP
+
+tolerations:
+- effect: "NoSchedule"
+  key: "on-demand"
+  operator: "Equal"
+  value: "true"
+nodeSelector:
+  "karpenter.sh/nodepool": "on-demand"
+  "topology.kubernetes.io/zone": "${aws_zone}"
+resources:
+  limits:
+    cpu: 100m
+    memory: 212Mi
+  requests:
+    cpu: 100m
+    memory: 212Mi
+
+mongodb:
+  image:
+    pullPolicy: IfNotPresent
+    registry: ${image_registry}
+    repository: tech-images
+    tag: mongodb-4-4-11
+  auth:
+    rootPassword: "${root_password}"
+    password: "${pritunl_password}"
+  tolerations:
+  - effect: "NoSchedule"
+    key: "on-demand"
+    operator: "Equal"
+    value: "true"
+  nodeSelector:
+    "karpenter.sh/nodepool": "on-demand"
+    "topology.kubernetes.io/zone": "${aws_zone}"
+  resources:
+    limits:
+      cpu: 150m
+      memory: 256Mi
+    requests:
+      cpu: 150m
+      memory: 256Mi
+  affinity: {}
+  podAntiAffinityPreset: ""
+  persistence:
+    existingClaim: "mongodb-pritunl"

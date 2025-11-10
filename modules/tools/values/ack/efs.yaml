@@ -1,0 +1,29 @@
+deployment:
+  tolerations:
+    - key: "arch/arm"
+      value: "true"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "${capacity_type}"
+      value: "true"
+      operator: "Equal"
+      effect: "NoSchedule"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: "${capacity_type}"
+    topology.kubernetes.io/zone: "${aws_zone}"
+
+resources:
+  requests:
+    memory: "${resources.memory}"
+    cpu: "${resources.cpu}"
+  limits:
+    memory: "${resources.memory}"
+    cpu: "${resources.cpu}"
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: "${role_arn}"
+
+reconcile:
+  defaultResyncPeriod: 180

@@ -1,0 +1,30 @@
+resources:
+  metricServer:
+    limits:
+      cpu: 40m
+      memory: 35Mi
+    requests:
+      cpu: 40m
+      memory: 35Mi
+  operator:
+    limits:
+      cpu: 25m
+      memory: 200Mi
+    requests:
+      cpu: 25m
+      memory: 200Mi
+  webhooks:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 10m
+      memory: 20Mi
+nodeSelector:
+  kubernetes.io/arch: arm64
+  topology.kubernetes.io/zone: "${aws_zone}"
+tolerations:
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"

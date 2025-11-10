@@ -1,0 +1,21 @@
+resources:
+  limits:
+    cpu: "${resources.cpu}"
+    memory: "${resources.memory}"
+  requests:
+    cpu: "${resources.cpu}"
+    memory: "${resources.memory}"
+
+nodeSelector:
+  kubernetes.io/arch: arm64
+  karpenter.sh/capacity-type: "${capacity_type}"
+
+tolerations:
+  - key: "${capacity_type}"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"

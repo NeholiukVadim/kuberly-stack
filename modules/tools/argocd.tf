@@ -1,0 +1,132 @@
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  namespace        = "argocd"
+  create_namespace = true
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  version          = "7.7.17"
+  values           = [templatefile("./values/argocd.yaml", {
+    reposerver_role_arn = module.argocd_reposerver_irsa_role.iam_role_arn
+    aws_zone           = var.aws_zone
+    account_id         = var.account_id
+    aws_region         = var.aws_region
+  })]
+}
+
+resource "kubernetes_cluster_role" "argocd_repo_server" {
+  metadata {
+    name = "argocd-repo-server-cue-clusterrole"
+  }
+
+  rule {
+    api_groups = ["cue.oam.dev"]
+    resources  = ["packages"]
+    verbs      = ["list", "get"]
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "argocd_repo_server" {
+  metadata {
+    name = "argocd-repo-server-cue-rolebinding"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "argocd-repo-server"
+    namespace = "argocd"
+  }
+
+  role_ref {
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.argocd_repo_server.metadata[0].name
+    api_group = "rbac.authorization.k8s.io"
+  }
+}
+
+module "argocd_reposerver_irsa_role" {
+  source           = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version          = "~> 5.0"
+  role_name_prefix = "argocd-reposerver-irsa-"
+
+  role_policy_arns = {
+    policy = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  }
+
+  oidc_providers = {
+    reposerver = {
+      provider_arn               = var.cluster_oidc_provider_arn
+      namespace_service_accounts = ["argocd:argocd-repo-server"]
+    }
+  }
+}
+
+resource "kubernetes_config_map_v1_data" "argocd_cm" {
+  metadata {
+    name      = "argocd-cm"
+    namespace = helm_release.argocd.metadata[0].namespace
+  }
+  force = true
+
+  data = {
+    "repositories" = <<EOF
+- name: infra
+  type: git
+  url: git@bitbucket.org:kuberly/infrastructure.git
+- name: vela-templates
+  type: git
+  url: git@bitbucket.org:kuberly/vela-templates.git
+- name: k8s-operator
+  type: git
+  url: git@bitbucket.org:kuberly/k8s-operator.git
+EOF
+    "repository.credentials" = <<EOF
+- sshPrivateKeySecret:
+    key: sshPrivateKey
+    name: bitbucket
+  url: git@bitbucket.org:kuberly/infrastructure.git
+- sshPrivateKeySecret:
+    key: sshPrivateKey
+    name: bitbucket
+  url: git@bitbucket.org:kuberly/vela-templates.git
+- sshPrivateKeySecret:
+    key: sshPrivateKey
+    name: bitbucket
+  url: git@bitbucket.org:kuberly/k8s-operator.git
+EOF
+    "application.resourceTrackingMethod" = "annotation"
+  }
+}
+
+resource "kubernetes_config_map_v1_data" "argocd_params_cm" {
+  metadata {
+    name      = "argocd-cmd-params-cm"
+    namespace = helm_release.argocd.metadata[0].namespace
+  }
+
+  force = true
+
+  data = {
+    "server.insecure" = "true"
+  }
+}
+
+resource "kubernetes_config_map_v1_data" "argocd_ssh_known_hosts_cm" {
+  metadata {
+    name      = "argocd-ssh-known-hosts-cm"
+    namespace = helm_release.argocd.metadata[0].namespace
+  }
+  force = true
+
+  data = {
+    "ssh_known_hosts" = <<EOF
+bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQeJzhupRu0u0cdegZIa8e86EG2qOCsIsD1Xw0xSeiPDlCr7kq97NLmMbpKTX6Esc30NuoqEEHCuc7yWtwp8dI76EEEB1VqY9QJq6vk+aySyboD5QF61I/1WeTwu+deCbgKMGbUijeXhtfbxSxm6JwGrXrhBdofTsbKRUsrN1WoNgUa8uqN1Vx6WAJw1JHPhglEGGHea6QICwJOAr/6mrui/oB7pkaWKHj3z7d1IC4KWLtY47elvjbaTlkN04Kc/5LFEirorGYVbt15kAUlqGM65pk6ZBxtaO3+30LVlORZkxOh+LKL/BvbZ/iRNhItLqNyieoQj/uh/7Iv4uyH/cV/0b4WDSd3DptigWq84lJubb9t/DnZlrJazxyDCulTmKdOR7vs9gMTo+uoIrPSb8ScTtvw65+odKAlBj59dhnVp9zd7QUojOpXlL62Aw56U4oO+FALuevvMjiWeavKhJqlR7i5n9srYcrNV7ttmDw7kf/97P5zauIhxcjX+xHv4M=
+bitbucket.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPIQmuzMBuKdWeF4+a2sjSSpBK0iqitSQ+5BM9KhpexuGt20JpTVM7u5BDZngncgrqDMbWdxMWWOGtZ9UgbqgZE=
+bitbucket.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIazEu89wgQZ4bqs3d63QSMzYVa0MuJ2e2gKTKqu+UUO
+github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
+gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
+gitlab.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsj2bNKTBSpIYDEGk9KxsGh3mySTRgMtXL583qmBpzeQ+jqCMRgBqB98u3z++J1sKlXHWfM9dyhSevkMwSbhoR8XIq/U0tCNyokEi/ueaBMCvbcTHhO7FcwzY92WK4Yt0aGROY5qX2UKSeOvuP4D6TPqKF1onrSzH9bx9XUf2lEdWT/ia1NEKjunUqu1xOB/StKDHMoX4/OKyIzuS0q/T1zOATthvasJFoPrAjkohTyaDUz2LN5JoH839hViyEG82yB+MjcFV5MU3N1l1QL3cVUCh93xSaua1N85qivl+siMkPGbO5xR/En4iEY6K2XPASUEMaieWVNTRCtJ4S8H+9
+ssh.dev.azure.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H
+EOF
+  }
+}

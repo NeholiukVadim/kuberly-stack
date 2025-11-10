@@ -1,0 +1,310 @@
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 30Mi
+      limits:
+        cpu: 10m
+        memory: 30Mi
+    tolerations:
+      - key: "arch/arm"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      - key: "on-demand"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+    nodeSelector:
+      kubernetes.io/arch: arm64
+      karpenter.sh/capacity-type: on-demand
+      topology.kubernetes.io/zone: "${aws_zone}"
+
+prometheus:
+  prometheusSpec:
+    enableAdminAPI: true
+    additionalScrapeConfigs:
+      - job_name: opencost
+        honor_labels: true
+        scrape_interval: 1m
+        scrape_timeout: 10s
+        metrics_path: /metrics
+        scheme: http
+        dns_sd_configs:
+          - names:
+            - opencost.opencost
+            type: 'A'
+            port: 9003
+
+    retention: ${metrics_retention_period}
+    tolerations:
+      - key: "arch/arm"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      - key: "on-demand"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+    nodeSelector:
+      kubernetes.io/arch: arm64
+      karpenter.sh/capacity-type: on-demand
+      topology.kubernetes.io/zone: "${aws_zone}"
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 3000Mi
+      limits:
+        cpu: 2000m
+        memory: 3000Mi
+    storageSpec: 
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: ${storage_size}
+  additionalPodMonitors:
+    - name: istio-cni-pod
+      podMetricsEndpoints:
+        - port: metrics
+          targetPort: 15014
+          path: /metrics
+          interval: 30s
+          scrapeTimeout: 10s
+      selector:
+        matchLabels:
+          k8s-app: istio-cni-node
+      namespaceSelector:
+        matchNames:
+          - istio-system
+
+    - name: istiod-pod
+      podMetricsEndpoints:
+        - port: http-monitoring
+          path: /metrics
+          interval: 15s
+          scrapeTimeout: 10s
+      selector:
+        matchLabels:
+          app: istiod
+      namespaceSelector:
+        matchNames:
+          - istio-system
+
+    - name: istio-gateways
+      podMetricsEndpoints:
+        - port: http-envoy-prom
+          path: /stats/prometheus
+          interval: 15s
+          scrapeTimeout: 10s
+        - targetPort: 15020
+          path: /metrics
+          interval: 15s
+          scrapeTimeout: 10s
+      selector:
+        matchLabels:
+          app.kubernetes.io/part-of: istio
+      namespaceSelector:
+        matchNames:
+          - istio-system
+
+    - name: istio-ztunnel
+      podMetricsEndpoints:
+        - targetPort: 15020
+          path: /metrics
+          interval: 15s
+          scrapeTimeout: 10s
+      selector:
+        matchLabels:
+          app: ztunnel
+      namespaceSelector:
+        matchNames:
+          - istio-system
+
+grafana:
+  enabled: true
+  namespaceOverride: "grafana"
+  adminPassword: ${grafana_password}
+  podDisruptionBudget:
+    minAvailable: 1
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  resources:
+    requests:
+      cpu: 300m
+      memory: 300Mi
+    limits:
+      cpu: 300m
+      memory: 300Mi
+  grafana.ini:
+    auth.proxy:
+      enabled: true
+      auto_sign_up: false
+      enable_login_token: true
+      disable_signout_menu: true
+    security:
+      allow_embedding: true
+    server:
+      domain: ${dns_domain}
+      root_url: https://${dns_domain}/grafana
+      serve_from_sub_path: true
+  serviceAccount:
+    create: true
+    name: "grafana"
+    annotations:
+      eks.amazonaws.com/role-arn: ${grafana_cloudwatch_role_arn}
+  additionalDataSources:
+    - name: CloudWatch
+      access: proxy
+      editable: false
+      jsonData:
+        authType: "default"
+        defaultRegion: "${aws_region}"
+      orgId: 1
+      type: cloudwatch
+      version: 1
+    - name: Loki
+      type: loki
+      url: http://loki-gateway.monitoring.svc.cluster.local
+      jsonData:
+        httpHeaderName1: "X-Scope-OrgID"
+      secureJsonData:
+        httpHeaderValue1: "admins"
+    - name: Tempo
+      type: tempo
+      url: http://tempo-query-frontend.monitoring.svc.cluster.local:3100
+      # access: proxy
+      # basicAuth: true
+      # basicAuthUser: admin
+      # secureJsonData:
+      #   basicAuthPassword: ${loki_password}
+  persistence:
+    enabled: true
+    storageClassName: "gp3"
+    size: 30Gi
+
+prometheusOperator:
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  resources:
+    requests:
+      cpu: 30m
+      memory: 51Mi
+    limits:
+      cpu: 30m
+      memory: 51Mi
+
+  prometheusConfigReloader:
+    tolerations:
+      - key: "arch/arm"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      - key: "on-demand"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+    nodeSelector:
+      kubernetes.io/arch: arm64
+      karpenter.sh/capacity-type: on-demand
+      topology.kubernetes.io/zone: "${aws_zone}"
+    resources:
+      requests:
+        cpu: 10m
+        memory: 20Mi
+      limits:
+        cpu: 10m
+        memory: 20Mi
+
+kube-state-metrics:
+  extraArgs:
+    - --metric-labels-allowlist=pods=[org_slug,project_slug,env_slug]
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+    karpenter.sh/capacity-type: on-demand
+    topology.kubernetes.io/zone: "${aws_zone}"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 360Mi
+    limits:
+      cpu: 50m
+      memory: 360Mi
+
+prometheus-node-exporter:
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "arch/amd"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    - key: "karpenter.sh/disruption"
+      value: "disrupting"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "type"
+      value: "karpenter"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "on-demand"
+      value: "true"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "spot"
+      value: "true"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "type"
+      operator: "Equal"
+      value: "karpenter"
+      effect: "NoSchedule"
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+  resources:
+    requests:
+      cpu: 15m
+      memory: 40Mi
+    limits:
+      cpu: 15m
+      memory: 40Mi

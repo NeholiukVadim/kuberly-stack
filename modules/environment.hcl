@@ -1,0 +1,1 @@
+inputs = jsondecode(file(find_in_parent_folders("kuberly.json")))

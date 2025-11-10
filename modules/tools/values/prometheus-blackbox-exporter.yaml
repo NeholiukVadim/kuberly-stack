@@ -1,0 +1,20 @@
+resources:
+  requests:
+    cpu: 10m
+    memory: 30Mi
+  limits:
+    cpu: 10m
+    memory: 30Mi
+tolerations:
+  - key: "arch/arm"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  - key: "on-demand"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+nodeSelector:
+  kubernetes.io/arch: arm64
+  karpenter.sh/capacity-type: on-demand
+  topology.kubernetes.io/zone: "${aws_zone}"

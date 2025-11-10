@@ -1,0 +1,42 @@
+_internal_defaults_do_not_set:
+  hub: "${account_id}.dkr.ecr.${aws_region}.amazonaws.com"
+  tag: "cni-1.27.2"
+  image: "istio"
+  ambient:
+    enabled: true
+    ipv6: false
+
+  privileged: true
+
+  excludeNamespaces:
+    - actions-runner-system
+    - actions-runners
+    - kube-public
+    - kube-system
+    - istio-system
+    - karpenter
+    - argocd
+    - vault
+    - vault-system
+    - vault-testing
+    - vela-system
+    - wfrun-tests
+    - opencost
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 80Mi
+    limits:
+      cpu: 10m
+      memory: 80Mi
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: eks.amazonaws.com/compute-type
+                operator: NotIn
+                values:
+                  - fargate

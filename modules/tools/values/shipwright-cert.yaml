@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: shipwright-webhook-cert
+  namespace: shipwright-build
+spec:
+  secretName: shipwright-build-webhook-cert
+  commonName: shipwright-build-webhook.shipwright-build.svc
+  dnsNames:
+  - shipwright-build-webhook.shipwright-build.svc
+  - shipwright-build-webhook.shipwright-build.svc.cluster.local
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer

@@ -1,0 +1,60 @@
+containerMode:
+  kubernetesModeWorkVolumeClaim:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 3Gi
+    storageClassName: gp3
+  template:
+    spec:
+      containers:
+      - command:
+        - /home/runner/run.sh
+        env:
+        - name: ACTIONS_RUNNER_CONTAINER_HOOKS
+          value: /home/runner/k8s/index.js
+        - name: ACTIONS_RUNNER_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+          value: "true"
+        - name: ACTIONS_RUNNER_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: ghcr.io/actions/actions-runner:2.316.0
+        name: runner
+        volumeMounts:
+        - mountPath: /home/runner/_work
+          name: work
+      securityContext:
+        fsGroup: 1001
+      volumes:
+      - ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 3Gi
+              storageClassName: gp3
+        name: work
+  type: kubernetes
+githubConfigSecret: github-pat
+githubConfigUrl: https://github.com/kuberly
+template:
+  spec:
+    containers:
+    - command:
+      - /home/runner/run.sh
+      image: ghcr.io/actions/actions-runner:2.316.0
+      name: runner
+      resources: 
+        requests:
+          memory: "128Mi"
+          cpu: "50m"
+    securityContext:
+      fsGroup: 1001

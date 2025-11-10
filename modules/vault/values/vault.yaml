@@ -1,0 +1,64 @@
+injector:
+  affinity: {}
+  nodeSelector:
+    karpenter.sh/capacity-type: "on-demand"
+    kubernetes.io/arch: arm64
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  resources:
+    requests:
+      memory: 40Mi
+      cpu: 15m
+    limits:
+      memory: 40Mi
+      cpu: 15m
+
+server:
+  affinity: {}
+  nodeSelector:
+    karpenter.sh/capacity-type: "on-demand"
+    kubernetes.io/arch: arm64
+  tolerations:
+    - key: "arch/arm"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  dataStorage:
+    size: 20Gi
+  resources:
+    requests:
+      memory: 90Mi
+      cpu: 50m
+    limits:
+      memory: 90Mi
+      cpu: 50m
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${role_arn} 
+  standalone:
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      storage "file" {
+        path = "/vault/data"
+      }
+
+      seal "awskms" {
+        region     = "${aws_region}"
+        kms_key_id = "${kms_key}"
+      }
+
+      auth "aws" {
+        region = "${aws_region}"
+      }
+ui:
+  enabled: true

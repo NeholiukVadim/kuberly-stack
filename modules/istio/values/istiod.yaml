@@ -1,0 +1,40 @@
+_internal_defaults_do_not_set:
+  hub: "${account_id}.dkr.ecr.${aws_region}.amazonaws.com"
+  tag: "pilot-1.27.2"
+  image: "istio"
+  traceSampling: 100.0
+  env:
+    PILOT_HTTP10: "1"
+    PILOT_ENABLE_AMBIENT: true
+
+  cni:
+    enabled: true
+    chained: true
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 700Mi
+    limits:
+      cpu: 300m
+      memory: 700Mi
+
+  meshConfig:
+    outboundTrafficPolicy:
+      mode: ALLOW_ANY
+    defaultConfig:     
+      gatewayTopology:     
+        numTrustedProxies: 2
+
+  tolerations:
+    - key: "on-demand"
+      value: "true"
+      operator: "Equal"
+      effect: "NoSchedule"
+    - key: "arch/arm"
+      value: "true"
+      operator: "Equal"
+      effect: "NoSchedule"
+  nodeSelector:
+    karpenter.sh/capacity-type: "on-demand"
+    kubernetes.io/arch: arm64
