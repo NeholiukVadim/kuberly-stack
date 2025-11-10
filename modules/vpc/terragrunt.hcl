@@ -1,9 +1,3 @@
-locals {
-    kuberly_config = jsondecode(file(find_in_parent_folders("kuberly.json")))
-    region = local.kuberly_config.region
-    environment = local.kuberly_config.environment
-}
-
 remote_state {
     backend = "s3"
     generate = {
@@ -11,8 +5,8 @@ remote_state {
         if_exists = "overwrite"
     }
     config = {
-        bucket         = "${get_aws_account_id()}-${local.region}-${local.environment}-tf-states"
-        region         = local.region
+        bucket         = "${get_aws_account_id()}-${include.root.inputs.region}-${include.root.inputs.environment}-tf-states"
+        region         = include.root.inputs.region
         key            = "vpc/terraform.tfstate"
         use_lockfile   = true
 
