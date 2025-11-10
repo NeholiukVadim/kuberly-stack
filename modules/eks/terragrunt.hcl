@@ -5,8 +5,8 @@ remote_state {
         if_exists = "overwrite"
     }
     config = {
-        bucket         = "${get_aws_account_id()}-${include.root.inputs.region}-${include.root.inputs.environment}-tf-states"
-        region         = include.root.inputs.region
+        bucket         = "${get_aws_account_id()}-${include.root.inputs.eks.region}-${include.root.inputs.eks.environment}-tf-states"
+        region         = include.root.inputs.eks.region
         key            = "eks/terraform.tfstate"
         use_lockfile   = true
 
@@ -25,8 +25,9 @@ include "root" {
 }
 
 inputs = {
-    kuberly_manager_role  = include.root.inputs.role_arn
-
+    kuberly_manager_role  = include.root.inputs.eks.role_arn
+    environment          = include.root.inputs.eks.environment
+    region              = include.root.inputs.eks.region
     vpc_id              = dependency.vpc.outputs.vpc_id
     private_subnets_ids = dependency.vpc.outputs.private_subnets_ids
     account_id          = get_aws_account_id()
@@ -44,6 +45,6 @@ terraform {
     source = "."
 }
 
-include "environment" {
+include "root" {
     path = find_in_parent_folders("root.hcl")
 }

@@ -1,8 +1,8 @@
 {
-    "region": "eu-central-1",
-    "environment": "dev",
-    "role_arn": "arn:aws:iam::743267407654:role/KuberlyRole-8b4ea525-e94b-4f38-b498-89ce346b568e",
     "eks": {
-        "version": "1.34"
+        "version": "1.34",
+        "region": "eu-central-1",
+        "environment": "dev",
+        "role_arn": "arn:aws:iam::743267407654:role/KuberlyRole-8b4ea525-e94b-4f38-b498-89ce346b568e"
     }
 }
