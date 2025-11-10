@@ -13,3 +13,4 @@ errored.tfstate
 */*/low-load/.terraform.lock.hcl
 plan.txt
 */*/low-load/plan.txt
+report.json

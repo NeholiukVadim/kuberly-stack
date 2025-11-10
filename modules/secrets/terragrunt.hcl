@@ -17,7 +17,7 @@ remote_state {
 
 inputs = {}
 include "environment" {
-    path = find_in_parent_folders("environment.hcl")
+    path = find_in_parent_folders("root.hcl")
 }
 terraform {
     source = "../../../modules/secrets"
