@@ -1,29 +1,5 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+```bash
+terragrunt run plan --all --iam-assume-role "arn:aws:iam::743267407654:role/KuberlyRole-8b4ea525-e94b-4f38-b498-89ce346b568e" --experiment-mode --no-auto-init=false --source-update --filter 'eks' --non-interactive --summary-per-unit --report-format json --report-file report.json
+```
