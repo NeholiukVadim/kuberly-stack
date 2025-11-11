@@ -8,6 +8,6 @@ include "root" {
 }
 
 inputs = {
-    region = include.root.inputs.eks.region
-    environment = include.root.inputs.eks.environment
+    region = include.root.inputs.target.cluster.region
+    environment = include.root.inputs.target.cluster.environment
 }

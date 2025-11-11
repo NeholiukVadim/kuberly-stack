@@ -5,8 +5,8 @@ remote_state {
         if_exists = "overwrite"
     }
     config = {
-        bucket         = "${get_aws_account_id()}-${include.root.inputs.eks.region}-${include.root.inputs.eks.environment}-tf-states"
-        region         = include.root.inputs.eks.region
+        bucket         = "${get_aws_account_id()}-${include.root.inputs.target.cluster.region}-${include.root.inputs.target.cluster.environment}-tf-states"
+        region         = include.root.inputs.target.cluster.region
         key            = "vpc/terraform.tfstate"
         use_lockfile   = true
 
@@ -25,9 +25,9 @@ include "root" {
 }
 
 inputs = {
-    environment          = include.root.inputs.eks.environment
-    region              = include.root.inputs.eks.region
-    cidr_block = "10.0.0.0/16"
-    private_subnets_cidrs = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
-    public_subnets_cidrs  = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
+    environment             = include.root.inputs.target.cluster.environment
+    region                  = include.root.inputs.target.cluster.region
+    cidr_block              = include.root.inputs.target.vpc.cidr_block
+    private_subnets_cidrs   = [for subnet in include.root.inputs.target.vpc.private_subnets : subnet.cidr_block]
+    public_subnets_cidrs    = [for subnet in include.root.inputs.target.vpc.public_subnets : subnet.cidr_block]
 }
