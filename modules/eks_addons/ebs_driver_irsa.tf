@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "ebs_csi_driver_webidentity" {
 
     condition {
       test     = "StringEquals"
-      variable = "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:aud"
+      variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:aud"
       values = [
         "sts.amazonaws.com"
       ]
@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "ebs_csi_driver_webidentity" {
 
     condition {
       test     = "StringEquals"
-      variable = "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub"
+      variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:sub"
 
       values = [
         "system:serviceaccount:kube-system:ebs-csi-controller-sa"
@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "ebs_csi_driver_webidentity" {
       type = "Federated"
 
       identifiers = [
-        module.eks.oidc_provider_arn
+        var.cluster_oidc_provider_arn
       ]
     }
   }
@@ -35,10 +35,11 @@ data "aws_iam_policy_document" "ebs_csi_driver_webidentity" {
 
 resource "aws_iam_role" "ebs_csi_driver" {
   assume_role_policy = data.aws_iam_policy_document.ebs_csi_driver_webidentity.json
-  name_prefix        = "${module.eks.cluster_name}-ebs-csi-driver"
+  name_prefix        = "${var.cluster_name}-ebs-csi-driver"
 }
 
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   role       = aws_iam_role.ebs_csi_driver.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
+

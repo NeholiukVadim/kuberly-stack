@@ -33,6 +33,6 @@ controller:
 
 postInstallHook:
   image:
-    repository: ${image_registry}/tech-images
-    tag: "kubectl-1-33-3"
+    repository: registry.k8s.io/kubectl
+    tag: "v1.34.1"
     digest: ""

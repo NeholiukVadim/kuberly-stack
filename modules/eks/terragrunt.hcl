@@ -41,12 +41,7 @@ inputs = {
     account_id          = get_aws_account_id()
     cluster_endpoint_public  = true
     cluster_version          = local.cluster_config.target.cluster.version
-    addon_vpc_cni_version    = "v1.19.2-eksbuild.1"
-    addon_coredns_version    = "v1.11.4-eksbuild.2"
-    addon_kube_proxy_version = "v1.32.0-eksbuild.2"
-    addon_ebs_csi_version    = "v1.38.1-eksbuild.2"
-    addon_pod_identity_version = "v1.3.4-eksbuild.1"
-    eks_access_iam_users = ["AWSReservedSSO_AdministratorAccess_2379587cbeadc092"]
+    eks_access_iam_users = try(local.cluster_config.target.cluster.eks_access_iam_users, [])
 }
 
 terraform {

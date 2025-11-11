@@ -7,7 +7,15 @@ include "root" {
   expose = true
 }
 
+locals {
+  cluster_config = [
+    for config in values(include.root.inputs) :
+    config
+    if try(config.target.cluster, null) != null
+  ][0]
+}
+
 inputs = {
-    region = include.root.inputs.target.cluster.region
-    environment = include.root.inputs.target.cluster.environment
+    region = local.cluster_config.target.cluster.region
+    environment = local.cluster_config.target.cluster.environment
 }
