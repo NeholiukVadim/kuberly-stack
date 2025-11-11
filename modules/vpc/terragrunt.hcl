@@ -5,8 +5,8 @@ remote_state {
         if_exists = "overwrite"
     }
     config = {
-        bucket         = "${get_aws_account_id()}-${include.root.inputs.target.cluster.region}-${include.root.inputs.target.cluster.environment}-tf-states"
-        region         = include.root.inputs.target.cluster.region
+        bucket         = "${get_aws_account_id()}-${include.root.inputs.kuberly.target.cluster.region}-${include.root.inputs.kuberly.target.cluster.environment}-tf-states"
+        region         = include.root.inputs.kuberly.target.cluster.region
         key            = "vpc/terraform.tfstate"
         use_lockfile   = true
 
@@ -25,9 +25,9 @@ include "root" {
 }
 
 inputs = {
-    environment             = include.root.inputs.target.cluster.environment
-    region                  = include.root.inputs.target.cluster.region
-    cidr_block              = include.root.inputs.target.vpc.cidr_block
-    private_subnets_cidrs   = [for subnet in include.root.inputs.target.vpc.private_subnets : subnet.cidr_block]
-    public_subnets_cidrs    = [for subnet in include.root.inputs.target.vpc.public_subnets : subnet.cidr_block]
+    environment             = include.root.inputs.kuberly.target.cluster.environment
+    region                  = include.root.inputs.kuberly.target.cluster.region
+    cidr_block              = include.root.inputs.kuberly.target.vpc.cidr_block
+    private_subnets_cidrs   = [for subnet in include.root.inputs.kuberly.target.vpc.private_subnets : subnet.cidr_block]
+    public_subnets_cidrs    = [for subnet in include.root.inputs.kuberly.target.vpc.public_subnets : subnet.cidr_block]
 }

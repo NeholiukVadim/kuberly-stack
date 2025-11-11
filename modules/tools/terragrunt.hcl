@@ -1,8 +1,3 @@
-locals {
-    parent_config = read_terragrunt_config(find_in_parent_folders("root.hcl"))
-    region = local.parent_config.locals.region
-}
-
 remote_state {
     backend = "s3"
     generate = {
