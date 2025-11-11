@@ -15,13 +15,13 @@ locals {
   private_subnets = try(local.cluster_config.target.vpc.private_subnets, [])
   
   on_demand_zones = local.topology == "single-zone" ? (
-    [local.private_subnets[0].availability_zone]
+    [local.private_subnets[1].availability_zone]
   ) : (
     [for subnet in local.private_subnets : subnet.availability_zone]
   )
   
   spot_zones = local.topology == "single-zone" ? (
-    [local.private_subnets[0].availability_zone]
+    [local.private_subnets[1].availability_zone]
   ) : (
     [for subnet in local.private_subnets : subnet.availability_zone]
   )
