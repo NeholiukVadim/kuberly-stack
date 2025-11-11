@@ -111,3 +111,9 @@ variable "capacity_type_mode" {
   description = "Capacity type mode (spot or on-demand) for addon node selectors"
   default     = ""
 }
+
+variable "karpenter_version" {
+  type        = string
+  description = "Karpenter version"
+  default     = ""
+}

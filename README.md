@@ -8,3 +8,8 @@ terragrunt run plan --all --iam-assume-role "arn:aws:iam::743267407654:role/Kube
 ```bash
 terragrunt run --all plan --queue-include-dir './modules/eks' --queue-strict-include --non-interactive --source-update --iam-assume-role "arn:aws:iam::743267407654:role/KuberlyRole-8b4ea525-e94b-4f38-b498-89ce346b568e"
 ```
+many modules -
+
+```bash
+terragrunt run --all plan --queue-include-dir './modules/eks' --queue-include-dir './modules/eks_addons' --queue-strict-include --non-interactive  --iam-assume-role "arn:aws:iam::743267407654:role/KuberlyRole-8b4ea525-e94b-4f38-b498-89ce346b568e
+```

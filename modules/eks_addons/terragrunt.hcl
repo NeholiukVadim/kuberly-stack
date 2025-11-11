@@ -71,6 +71,7 @@ inputs = {
     on_demand_zones         = local.on_demand_zones
     spot_zones              = local.spot_zones
     capacity_type_mode      = local.capacity_type_mode
+    karpenter_version       = "1.8.2"
 }
 
 terraform {

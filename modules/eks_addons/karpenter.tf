@@ -21,8 +21,14 @@ resource "helm_release" "karpenter_crd" {
   chart               = "karpenter-crd"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  version             = "1.8.2"
+  version             = var.karpenter_version
   wait                = true
+
+  lifecycle {
+    ignore_changes = [
+      repository_password,
+    ]
+  }
 }
 
 resource "helm_release" "karpenter" {
@@ -33,7 +39,7 @@ resource "helm_release" "karpenter" {
   chart             = "karpenter"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  version           = "1.8.2"
+  version           = var.karpenter_version
 
   values = [templatefile("./values/karpenter.yaml", {
     cluster_name     = var.cluster_name,
@@ -44,6 +50,12 @@ resource "helm_release" "karpenter" {
   })]
 
   depends_on = [helm_release.karpenter_crd]
+
+  lifecycle {
+    ignore_changes = [
+      repository_password,
+    ]
+  }
 }
 
 resource "kubectl_manifest" "node_class" {
