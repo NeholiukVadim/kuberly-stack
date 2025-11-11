@@ -1,11 +1,11 @@
 locals {
   root_dir = get_parent_terragrunt_dir()
   
-  json_files = sort(tolist(fileset(local.root_dir, "*.json")))
+  json_files = sort(tolist(fileset("${local.root_dir}/components", "*.json")))
   
   merged_inputs = {
     for file in local.json_files : 
-      replace(basename(file), ".json", "") => jsondecode(file("${local.root_dir}/${file}"))
+      replace(basename(file), ".json", "") => jsondecode(file("${local.root_dir}/components/${file}"))
   }
 }
 
