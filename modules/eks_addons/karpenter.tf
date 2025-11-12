@@ -2,10 +2,10 @@ module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
   version = "~> 20.36.1"
 
-  cluster_name                    = module.eks.cluster_name
+  cluster_name                    = var.cluster_name
   create_access_entry             = true
   enable_irsa                     = true
-  irsa_oidc_provider_arn          = module.eks.oidc_provider_arn
+  irsa_oidc_provider_arn          = var.cluster_oidc_provider_arn
   irsa_namespace_service_accounts = ["karpenter:karpenter"]
 
   node_iam_role_additional_policies = {
@@ -21,10 +21,14 @@ resource "helm_release" "karpenter_crd" {
   chart               = "karpenter-crd"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  version             = "1.8.0"
+  version             = var.karpenter_version
   wait                = true
 
-  depends_on = [module.eks.eks_managed_node_groups]
+  lifecycle {
+    ignore_changes = [
+      repository_password,
+    ]
+  }
 }
 
 resource "helm_release" "karpenter" {
@@ -35,17 +39,23 @@ resource "helm_release" "karpenter" {
   chart             = "karpenter"
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
-  version           = "1.8.0"
+  version           = var.karpenter_version
 
   values = [templatefile("./values/karpenter.yaml", {
-    cluster_name     = module.eks.cluster_name,
-    cluster_endpoint = module.eks.cluster_endpoint,
+    cluster_name     = var.cluster_name,
+    cluster_endpoint = var.cluster_endpoint,
     queue_name       = module.karpenter.queue_name,
     iam_role_arn     = module.karpenter.iam_role_arn,
     image_registry   = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com"
   })]
 
   depends_on = [helm_release.karpenter_crd]
+
+  lifecycle {
+    ignore_changes = [
+      repository_password,
+    ]
+  }
 }
 
 resource "kubectl_manifest" "node_class" {
@@ -71,10 +81,10 @@ resource "kubectl_manifest" "node_class" {
           volumeType: gp3
       securityGroupSelectorTerms:
       - tags:
-          karpenter.sh/discovery: ${module.eks.cluster_name}
+          karpenter.sh/discovery: ${var.cluster_name}
       subnetSelectorTerms:
       - tags:
-          karpenter.sh/discovery: ${module.eks.cluster_name}
+          karpenter.sh/discovery: ${var.cluster_name}
       metadataOptions:
         httpEndpoint: enabled
         httpProtocolIPv6: disabled
@@ -89,21 +99,11 @@ resource "kubectl_manifest" "node_class" {
   ]
 }
 
-resource "kubectl_manifest" "karpenter_node_pool" {
-  yaml_body = templatefile("./nodepools/default.yaml", {
-    environment     = var.environment
-    region          = var.region
-  })
-
-  depends_on = [
-    kubectl_manifest.node_class
-  ]
-}
-
-resource "kubectl_manifest" "karpenter_node_pool_on_demand" {
+resource "kubectl_manifest" "on_demand_node_pool" {
   yaml_body = templatefile("./nodepools/on-demand.yaml", {
     environment     = var.environment
     region          = var.region
+    zones           = jsonencode(var.on_demand_zones)
   })
 
   depends_on = [
@@ -111,10 +111,11 @@ resource "kubectl_manifest" "karpenter_node_pool_on_demand" {
   ]
 }
 
-resource "kubectl_manifest" "on_demand_arm" {
+resource "kubectl_manifest" "on_demand_arm_node_pool" {
   yaml_body = templatefile("./nodepools/on-demand-arm.yaml", {
     environment     = var.environment
     region          = var.region
+    zones           = jsonencode(var.on_demand_zones)
   })
 
   depends_on = [
@@ -126,6 +127,7 @@ resource "kubectl_manifest" "spot_node_pool" {
   yaml_body = templatefile("./nodepools/spot.yaml", {
     environment     = var.environment
     region          = var.region
+    zones           = jsonencode(var.spot_zones)
   })
 
   depends_on = [
@@ -133,10 +135,11 @@ resource "kubectl_manifest" "spot_node_pool" {
   ]
 }
 
-resource "kubectl_manifest" "arm_spot_ci_node_pool" {
+resource "kubectl_manifest" "spot_arm_node_pool" {
   yaml_body = templatefile("./nodepools/spot-arm.yaml", {
     environment     = var.environment
     region          = var.region
+    zones           = jsonencode(var.spot_zones)
   })
 
   depends_on = [
@@ -144,7 +147,7 @@ resource "kubectl_manifest" "arm_spot_ci_node_pool" {
   ]
 }
 
-resource "aws_iam_service_linked_role" "spot" {
+resource "aws_iam_service_linked_role" "spot_iam_service_linked_role" {
   aws_service_name = "spot.amazonaws.com"
   description      = "Service linked role for EC2 spot instances"
   lifecycle {

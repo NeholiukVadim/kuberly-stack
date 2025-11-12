@@ -1,0 +1,8 @@
+{
+    "bucket_name": "kuberly-loki-bucket-050752643586-us-east-2-test3",
+    "bucket_suffix": "default",
+    "logs_expiration_period": 7,
+    "namespace": "050752643586-us-east-2-test3",
+    "policy_name": "kuberly-loki-s3-policy-050752643586-us-east-2-test3",
+    "role_name": "kuberly-loki-s3-role-050752643586-us-east-2-test3"
+}

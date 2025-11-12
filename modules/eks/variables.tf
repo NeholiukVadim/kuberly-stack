@@ -31,29 +31,9 @@ variable "cluster_version" {
   type        = string
   description = "Version of EKS cluster"
 }
-variable "addon_vpc_cni_version" {
-  type        = string
-  description = "Version of vpc_cni addon"
-}
-variable "addon_coredns_version" {
-  type        = string
-  description = "Version of coredns addon"
-}
-variable "addon_kube_proxy_version" {
-  type        = string
-  description = "Version of kube_proxy addon"
-}
-variable "addon_ebs_csi_version" {
-  type        = string
-  description = "Version of ebs_csi addon"
-}
-variable "addon_pod_identity_version" {
-  type        = string
-  description = "Version of ebs_csi addon"
-}
 variable "eks_access_iam_users" {
   type        = list(string)
-  description = "List of IAM user names (SSO usernames) that should have admin access to the EKS cluster"
+  description = "List of IAM role ARNs that should have admin access to the EKS cluster"
   default     = []
 }
 

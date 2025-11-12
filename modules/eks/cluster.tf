@@ -1,7 +1,7 @@
 # EKS module and dependent resources
 
 locals {
-  kuberly_manager_role  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.kuberly_manager_role}"
+  kuberly_manager_role  = var.kuberly_manager_role
 
   node_security_group_additional_rules = {
     ingress_all = {
@@ -33,7 +33,7 @@ locals {
   } : {}
   
   user_access_entries = length(var.eks_access_iam_users) > 0 ? {
-    for username in var.eks_access_iam_users : username => {
+    for arn in var.eks_access_iam_users : arn => {
       policy_associations = {
           admin_policy = {
             policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -42,7 +42,7 @@ locals {
             }
           }
         }
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${username}"
+      principal_arn = arn
       type          = "STANDARD"
     }
   } : {}

@@ -1,7 +1,7 @@
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
-  name: spot
+  name: on-demand
   namespace: karpenter
   labels:
     "type": "karpenter"
@@ -21,7 +21,7 @@ spec:
           values: ["amd64"]
         - key: "karpenter.sh/capacity-type"
           operator: In
-          values: ["spot"]
+          values: ["on-demand"]
         - key: "karpenter.k8s.aws/instance-size"
           operator: In
           values: ["medium", "large", "xlarge", "2xlarge", "4xlarge"]
@@ -36,7 +36,7 @@ spec:
           values: ["1"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          values: ["${region}"]
+          values: ${zones}
   limits:
     cpu: 40
     memory: 100Gi
@@ -63,5 +63,5 @@ spec:
       reasons: ["Underutilized", "Drifted"]
     - nodes: "100%"
       reasons: ["Empty"]
-  weight: 80
+  weight: 50
   terminationGracePeriod: 60s

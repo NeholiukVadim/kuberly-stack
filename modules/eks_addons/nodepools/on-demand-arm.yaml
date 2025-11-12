@@ -36,7 +36,7 @@ spec:
           values: ["1"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          values: ["${region}"]
+          values: ${zones}
   limits:
     cpu: 40
     memory: 100Gi
