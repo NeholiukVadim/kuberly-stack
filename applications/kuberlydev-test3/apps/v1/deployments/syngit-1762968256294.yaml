@@ -97,11 +97,11 @@ spec:
                     timeoutSeconds: 5
                   resources:
                     limits:
-                        cpu: 100m
-                        memory: 100Mi
+                        cpu: 128m
+                        memory: 128Mi
                     requests:
-                        cpu: 100m
-                        memory: 100Mi
+                        cpu: 128m
+                        memory: 128Mi
                   terminationMessagePath: /dev/termination-log
                   terminationMessagePolicy: File
             dnsPolicy: ClusterFirst
