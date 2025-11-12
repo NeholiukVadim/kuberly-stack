@@ -2,13 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     annotations:
-        app.oam.dev/last-applied-configuration: '{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"oam.dev/kubevela-version":"v1.9.11"},"labels":{"app.oam.dev/app-revision-hash":"193e57ac8ba5fa30","app.oam.dev/appRevision":"syngit-1762968256294-v5","app.oam.dev/cluster":"050752643586-us-east-2-test3","app.oam.dev/component":"syngit-1762968256294","app.oam.dev/name":"syngit-1762968256294","app.oam.dev/namespace":"050752643586-us-east-2-test3","app.oam.dev/resourceType":"WORKLOAD","app.oam.dev/revision":"","kuberly.io/app_id":"bc62a9cb-75e5-4d00-a4af-61f3eb373aba","kuberly.io/app_name":"syngit-1762968256294","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev","oam.dev/render-hash":"efe276150e6be2eb","workload.oam.dev/type":"deployment-v0.0.4"},"name":"syngit-1762968256294","namespace":"kuberlydev-test3"},"spec":{"selector":{"matchLabels":{"app.oam.dev/component":"syngit-1762968256294"}},"template":{"metadata":{"annotations":{"karpenter.sh/do-not-disrupt":"true","kubectl.kubernetes.io/restartedAt":"2025-11-12T18:11:08Z","reloader.stakater.com/auto":"true"},"labels":{"app.oam.dev/component":"syngit-1762968256294","app.oam.dev/name":"syngit-1762968256294","kuberly.io/app_id":"bc62a9cb-75e5-4d00-a4af-61f3eb373aba","kuberly.io/app_name":"syngit-1762968256294","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev"},"name":"syngit-1762968256294","namespace":"kuberlydev-test3"},"spec":{"containers":[{"envFrom":[{"secretRef":{"name":"bc62a9cb-75e5-4d00-a4af-61f3eb373aba-env-secrets"}}],"image":"050752643586.dkr.ecr.us-east-2.amazonaws.com/test2-1753791287927:test-app-1753791346-aa79bc8789214137e7d4d6276f6dab6f7d585f7b","livenessProbe":{"failureThreshold":3,"initialDelaySeconds":0,"periodSeconds":60,"successThreshold":1,"tcpSocket":{"port":9092},"timeoutSeconds":5},"name":"syngit-1762968256294","ports":[{"containerPort":9092,"name":"port-9092","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"initialDelaySeconds":0,"periodSeconds":60,"successThreshold":1,"tcpSocket":{"port":9092},"timeoutSeconds":5},"resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}}],"nodeSelector":{"karpenter.sh/capacity-type":"spot","kubernetes.io/arch":"arm64"},"tolerations":[{"effect":"NoSchedule","key":"spot","operator":"Equal","value":"true"},{"effect":"NoSchedule","key":"arch/arm64","operator":"Equal","value":"true"}]}}}}'
+        app.oam.dev/last-applied-configuration: '{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"app.oam.dev/publishVersion":"v0.0.1","oam.dev/kubevela-version":"v1.9.11"},"labels":{"app.oam.dev/app-revision-hash":"16c7ab4c1ca92bcc","app.oam.dev/appRevision":"syngit-1762968256294-v6","app.oam.dev/cluster":"050752643586-us-east-2-test3","app.oam.dev/component":"syngit-1762968256294","app.oam.dev/name":"syngit-1762968256294","app.oam.dev/namespace":"050752643586-us-east-2-test3","app.oam.dev/resourceType":"WORKLOAD","app.oam.dev/revision":"","kuberly.io/app_id":"bc62a9cb-75e5-4d00-a4af-61f3eb373aba","kuberly.io/app_name":"syngit-1762968256294","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev","oam.dev/render-hash":"f5f919a2cf1e1d33","workload.oam.dev/type":"deployment-v0.0.4"},"name":"syngit-1762968256294","namespace":"kuberlydev-test3"},"spec":{"selector":{"matchLabels":{"app.oam.dev/component":"syngit-1762968256294"}},"template":{"metadata":{"annotations":{"karpenter.sh/do-not-disrupt":"true","reloader.stakater.com/auto":"true"},"labels":{"app.oam.dev/component":"syngit-1762968256294","app.oam.dev/name":"syngit-1762968256294","kuberly.io/app_id":"bc62a9cb-75e5-4d00-a4af-61f3eb373aba","kuberly.io/app_name":"syngit-1762968256294","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev"},"name":"syngit-1762968256294","namespace":"kuberlydev-test3"},"spec":{"containers":[{"envFrom":[{"secretRef":{"name":"bc62a9cb-75e5-4d00-a4af-61f3eb373aba-env-secrets"}}],"image":"050752643586.dkr.ecr.us-east-2.amazonaws.com/test2-1753791287927:test-app-1753791346-aa79bc8789214137e7d4d6276f6dab6f7d585f7b","livenessProbe":{"failureThreshold":3,"initialDelaySeconds":0,"periodSeconds":60,"successThreshold":1,"tcpSocket":{"port":9092},"timeoutSeconds":5},"name":"syngit-1762968256294","ports":[{"containerPort":9092,"name":"port-9092","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"initialDelaySeconds":0,"periodSeconds":60,"successThreshold":1,"tcpSocket":{"port":9092},"timeoutSeconds":5},"resources":{"limits":{"cpu":"128m","memory":"128Mi"},"requests":{"cpu":"128m","memory":"128Mi"}}}],"nodeSelector":{"karpenter.sh/capacity-type":"spot","kubernetes.io/arch":"arm64"},"tolerations":[{"effect":"NoSchedule","key":"spot","operator":"Equal","value":"true"},{"effect":"NoSchedule","key":"arch/arm64","operator":"Equal","value":"true"}]}}}}'
         app.oam.dev/last-applied-time: "2025-11-12T18:11:10Z"
+        app.oam.dev/publishVersion: v0.0.1
         deployment.kubernetes.io/revision: "1"
         oam.dev/kubevela-version: v1.9.11
     labels:
-        app.oam.dev/app-revision-hash: 193e57ac8ba5fa30
-        app.oam.dev/appRevision: syngit-1762968256294-v5
+        app.oam.dev/app-revision-hash: 16c7ab4c1ca92bcc
+        app.oam.dev/appRevision: syngit-1762968256294-v6
         app.oam.dev/cluster: 050752643586-us-east-2-test3
         app.oam.dev/component: syngit-1762968256294
         app.oam.dev/name: syngit-1762968256294
@@ -28,7 +29,7 @@ metadata:
         kuberly.io/org_slug: kuberlydevorg-1747916123
         kuberly.io/project_id: b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045
         kuberly.io/project_slug: kuberlydev
-        oam.dev/render-hash: efe276150e6be2eb
+        oam.dev/render-hash: f5f919a2cf1e1d33
         workload.oam.dev/type: deployment-v0.0.4
     name: syngit-1762968256294
     namespace: kuberlydev-test3
@@ -48,7 +49,6 @@ spec:
         metadata:
             annotations:
                 karpenter.sh/do-not-disrupt: "true"
-                kubectl.kubernetes.io/restartedAt: "2025-11-12T18:11:08Z"
                 reloader.stakater.com/auto: "true"
             creationTimestamp: null
             labels:
@@ -97,11 +97,11 @@ spec:
                     timeoutSeconds: 5
                   resources:
                     limits:
-                        cpu: 100m
-                        memory: 100Mi
+                        cpu: 128m
+                        memory: 128Mi
                     requests:
-                        cpu: 100m
-                        memory: 100Mi
+                        cpu: 128m
+                        memory: 128Mi
                   terminationMessagePath: /dev/termination-log
                   terminationMessagePolicy: File
             dnsPolicy: ClusterFirst
