@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    annotations: {}
+    labels:
+        app: nginx
+    name: test-syngit2
+    namespace: kuberlydev-test3
+spec:
+    progressDeadlineSeconds: 600
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+        matchLabels:
+            app: nginx
+    strategy:
+        rollingUpdate:
+            maxSurge: 25%
+            maxUnavailable: 25%
+        type: RollingUpdate
+    template:
+        metadata:
+            creationTimestamp: null
+            labels:
+                app: nginx
+        spec:
+            containers:
+                - image: nginx:1.14.2
+                  imagePullPolicy: IfNotPresent
+                  name: nginx
+                  ports:
+                    - containerPort: 80
+                      protocol: TCP
+                  resources:
+                    limits:
+                        cpu: 100m
+                        memory: 100Mi
+                    requests:
+                        cpu: 100m
+                        memory: 100Mi
+                  terminationMessagePath: /dev/termination-log
+                  terminationMessagePolicy: File
+            dnsPolicy: ClusterFirst
+            restartPolicy: Always
+            schedulerName: default-scheduler
+            securityContext: {}
+            terminationGracePeriodSeconds: 30
+            tolerations:
+                - effect: NoSchedule
+                  key: on-demand
+                  operator: Equal
+                  value: "true"
+                - effect: NoSchedule
+                  key: arch/arm64
+                  operator: Equal
+                  value: "true"
