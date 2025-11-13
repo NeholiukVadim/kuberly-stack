@@ -1,0 +1,51 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+    annotations:
+        app.oam.dev/last-applied-configuration: '{"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{"app.oam.dev/publishVersion":"v0.0.1","oam.dev/kubevela-version":"v1.9.11"},"labels":{"app.oam.dev/app-revision-hash":"fa43a6b844f503b8","app.oam.dev/appRevision":"syngittest-1762972466507-v5","app.oam.dev/cluster":"050752643586-us-east-2-test3","app.oam.dev/component":"syngittest-1762972466507","app.oam.dev/name":"syngittest-1762972466507","app.oam.dev/namespace":"050752643586-us-east-2-test3","app.oam.dev/resourceType":"TRAIT","app.oam.dev/revision":"","kuberly.io/app_id":"0cb48da2-59bc-4041-82a3-b9612bd45f7c","kuberly.io/app_name":"syngittest-1762972466507","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev","oam.dev/render-hash":"e2982bca1a671e33","trait.oam.dev/resource":"scaledobject","trait.oam.dev/type":"scaling-v0.0.4"},"name":"syngittest-1762972466507","namespace":"kuberlydev-test3"},"spec":{"maxReplicaCount":3,"minReplicaCount":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"syngittest-1762972466507"},"triggers":[{"metadata":{"value":"90"},"metricType":"Utilization","type":"cpu"},{"metadata":{"value":"90"},"metricType":"Utilization","type":"memory"}]}}'
+        app.oam.dev/last-applied-time: "2025-11-13T09:37:31Z"
+        app.oam.dev/publishVersion: v0.0.1
+        oam.dev/kubevela-version: v1.9.11
+    labels:
+        app.oam.dev/app-revision-hash: fa43a6b844f503b8
+        app.oam.dev/appRevision: syngittest-1762972466507-v5
+        app.oam.dev/cluster: 050752643586-us-east-2-test3
+        app.oam.dev/component: syngittest-1762972466507
+        app.oam.dev/name: syngittest-1762972466507
+        app.oam.dev/namespace: 050752643586-us-east-2-test3
+        app.oam.dev/resourceType: TRAIT
+        app.oam.dev/revision: ""
+        kuberly.io/app_id: 0cb48da2-59bc-4041-82a3-b9612bd45f7c
+        kuberly.io/app_name: syngittest-1762972466507
+        kuberly.io/app_type: repo
+        kuberly.io/cluster_id: 698b19d1-7582-429f-978f-93837216f510
+        kuberly.io/container_build_id: 7601cbfa-9488-43bf-9e81-e2a7b52d8275
+        kuberly.io/container_image_id: 1edadc97-4830-4bd7-ad30-6d3cd0a62e85
+        kuberly.io/container_registry_id: 0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3
+        kuberly.io/env_id: f37ca8ab-1a2a-4409-b9d5-91039711ab33
+        kuberly.io/env_slug: test3
+        kuberly.io/org_id: efcba3c4-c928-47a2-8054-212676ba5264
+        kuberly.io/org_slug: kuberlydevorg-1747916123
+        kuberly.io/project_id: b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045
+        kuberly.io/project_slug: kuberlydev
+        oam.dev/render-hash: e2982bca1a671e33
+        trait.oam.dev/resource: scaledobject
+        trait.oam.dev/type: scaling-v0.0.4
+    name: syngittest-1762972466507
+    namespace: kuberlydev-test3
+spec:
+    maxReplicaCount: 3
+    minReplicaCount: 1
+    scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: syngittest-1762972466507
+    triggers:
+        - metadata:
+            value: "90"
+          metricType: Utilization
+          type: cpu
+        - metadata:
+            value: "90"
+          metricType: Utilization
+          type: memory
