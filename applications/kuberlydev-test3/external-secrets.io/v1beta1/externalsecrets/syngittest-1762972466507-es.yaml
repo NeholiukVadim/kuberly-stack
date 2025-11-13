@@ -2,13 +2,13 @@ apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
     annotations:
-        app.oam.dev/last-applied-configuration: '{"apiVersion":"external-secrets.io/v1beta1","kind":"ExternalSecret","metadata":{"annotations":{"app.oam.dev/publishVersion":"0.0.5","oam.dev/kubevela-version":"v1.9.11"},"labels":{"app.oam.dev/app-revision-hash":"fa43a6b844f503b8","app.oam.dev/appRevision":"syngittest-1762972466507-v9","app.oam.dev/cluster":"050752643586-us-east-2-test3","app.oam.dev/component":"syngittest-1762972466507","app.oam.dev/name":"syngittest-1762972466507","app.oam.dev/namespace":"050752643586-us-east-2-test3","app.oam.dev/resourceType":"TRAIT","app.oam.dev/revision":"","kuberly.io/app_id":"0cb48da2-59bc-4041-82a3-b9612bd45f7c","kuberly.io/app_name":"syngittest-1762972466507","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev","oam.dev/render-hash":"a618dbc3fbebbfef","trait.oam.dev/resource":"externalsecret","trait.oam.dev/type":"external-secret-v0.0.4"},"name":"syngittest-1762972466507-es","namespace":"kuberlydev-test3"},"spec":{"data":[{"remoteRef":{"key":"secret/data/orgs/efcba3c4-c928-47a2-8054-212676ba5264/env/f37ca8ab-1a2a-4409-b9d5-91039711ab33/secret/default","property":"MYSECRET"},"secretKey":"MYSECRET"}],"refreshInterval":"10s","secretStoreRef":{"kind":"ClusterSecretStore","name":"vault-backend"},"target":{"deletionPolicy":"Merge","name":"0cb48da2-59bc-4041-82a3-b9612bd45f7c-env-secrets","template":{"data":{"MYSECRET":"{{ .MYSECRET }}"},"engineVersion":"v2","mergePolicy":"Merge"}}}}'
+        app.oam.dev/last-applied-configuration: '{"apiVersion":"external-secrets.io/v1beta1","kind":"ExternalSecret","metadata":{"annotations":{"app.oam.dev/publishVersion":"0.0.6","oam.dev/kubevela-version":"v1.9.11"},"labels":{"app.oam.dev/app-revision-hash":"fa43a6b844f503b8","app.oam.dev/appRevision":"syngittest-1762972466507-v10","app.oam.dev/cluster":"050752643586-us-east-2-test3","app.oam.dev/component":"syngittest-1762972466507","app.oam.dev/name":"syngittest-1762972466507","app.oam.dev/namespace":"050752643586-us-east-2-test3","app.oam.dev/resourceType":"TRAIT","app.oam.dev/revision":"","kuberly.io/app_id":"0cb48da2-59bc-4041-82a3-b9612bd45f7c","kuberly.io/app_name":"syngittest-1762972466507","kuberly.io/app_type":"repo","kuberly.io/cluster_id":"698b19d1-7582-429f-978f-93837216f510","kuberly.io/container_build_id":"7601cbfa-9488-43bf-9e81-e2a7b52d8275","kuberly.io/container_image_id":"1edadc97-4830-4bd7-ad30-6d3cd0a62e85","kuberly.io/container_registry_id":"0b2550fb-5b25-46c3-b2d5-f2a6323ee0a3","kuberly.io/env_id":"f37ca8ab-1a2a-4409-b9d5-91039711ab33","kuberly.io/env_slug":"test3","kuberly.io/org_id":"efcba3c4-c928-47a2-8054-212676ba5264","kuberly.io/org_slug":"kuberlydevorg-1747916123","kuberly.io/project_id":"b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045","kuberly.io/project_slug":"kuberlydev","oam.dev/render-hash":"b111ba978ca1d3a7","trait.oam.dev/resource":"externalsecret","trait.oam.dev/type":"external-secret-v0.0.4"},"name":"syngittest-1762972466507-es","namespace":"kuberlydev-test3"},"spec":{"data":[{"remoteRef":{"key":"secret/data/orgs/efcba3c4-c928-47a2-8054-212676ba5264/env/f37ca8ab-1a2a-4409-b9d5-91039711ab33/secret/default","property":"MYSECRET"},"secretKey":"MYSECRET"}],"refreshInterval":"10s","secretStoreRef":{"kind":"ClusterSecretStore","name":"vault-backend"},"target":{"deletionPolicy":"Merge","name":"0cb48da2-59bc-4041-82a3-b9612bd45f7c-env-secrets","template":{"data":{"MYSECRET":"{{ .MYSECRET }}"},"engineVersion":"v2","mergePolicy":"Merge"}}}}'
         app.oam.dev/last-applied-time: "2025-11-13T10:09:50Z"
-        app.oam.dev/publishVersion: 0.0.5
+        app.oam.dev/publishVersion: 0.0.6
         oam.dev/kubevela-version: v1.9.11
     labels:
         app.oam.dev/app-revision-hash: fa43a6b844f503b8
-        app.oam.dev/appRevision: syngittest-1762972466507-v9
+        app.oam.dev/appRevision: syngittest-1762972466507-v10
         app.oam.dev/cluster: 050752643586-us-east-2-test3
         app.oam.dev/component: syngittest-1762972466507
         app.oam.dev/name: syngittest-1762972466507
@@ -28,7 +28,7 @@ metadata:
         kuberly.io/org_slug: kuberlydevorg-1747916123
         kuberly.io/project_id: b9d0c6cf-6c7d-4fe5-af82-8f2b3b56d045
         kuberly.io/project_slug: kuberlydev
-        oam.dev/render-hash: a618dbc3fbebbfef
+        oam.dev/render-hash: b111ba978ca1d3a7
         trait.oam.dev/resource: externalsecret
         trait.oam.dev/type: external-secret-v0.0.4
     name: syngittest-1762972466507-es
